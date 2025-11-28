@@ -1,17 +1,29 @@
-import Squares from './components/hero/Squares'
 import TextType from './components/hero/TextType'
-import headerImg from "../src/assets/header-img.svg"; 
+import LightRays from './components/hero/LightRays';
+import { Globe } from 'react-feather';
+import PersonalCard from './components/about/personalCard';
+import SkillsSection from './components/about/SkillSection';
+import Tools from './components/about/Tools';
+import Project from './components/about/Project';
+import Sertificate from './components/about/Sertificate';
+import DomeGallery from './components/about/DomeGallery';
 
 function App() {
   return (
     <div className="bg-black">
       <div className="relative min-h-screen overflow-hidden text-white">
         <div className="absolute inset-0 z-10">
-          <Squares
-            speed={0.5}
-            squareSize={40}
-            direction="diagonal"
-            hoverFillColor="rgba(255,255,255,0.05)"
+          <LightRays
+            raysOrigin="top-center"
+            raysColor="white"
+            raysSpeed={2.5}
+            lightSpread={0.8}
+            rayLength={1.2}
+            followMouse={true}
+            mouseInfluence={0.1}
+            noiseAmount={0.1}
+            distortion={0.05}
+            className="custom-rays"
           />
         </div>
 
@@ -21,20 +33,24 @@ function App() {
           </div>
           <nav className="flex space-x-8">
             <a href="#" className="hover:text-gray-300">Home</a>
-            <a href="#" className="hover:text-gray-300">Skill</a>
-            <a href="#" className="hover:text-gray-300">Certificate</a>
-            <a href="#" className="hover:text-gray-300">Project</a>
+            <a href="#" className="hover:text-gray-300">About</a>
+            <a href="#" className="hover:text-gray-300">Experience</a>
           </nav>
         </header>
 
-        <main className="flex flex-col md:flex-row items-center justify-center text-center h-[80vh] relative z-10 px-4 gap-10">
+        <main className="flex flex-col justify-center items-center text-center h-[80vh] relative z-10 px-4 gap-10">
 
-          <div className="max-w-150 mx-auto">
-            <div className="text-4xl md:text-4xl font-bold leading-tight max-w-120 text-start">
+          <div className="flex gap-2 font-bold justify-center border pl-4 pr-4 pt-1 pb-1 border-transparent bg-gray-600 rounded-4xl">
+            <Globe /><p>East Java, Indonesia</p>
+          </div>
+
+          <div className="mx-auto">
+            <div className="text-6xl font-bold leading-tight text-center mx-auto">
               <TextType
                 text={[
                   "Hello World!!",
-                  "My name is Udinn I'm a FrontEnd Web Developer",
+                  "My name is Udinn ",
+                  "I'm a FrontEnd Web Developer",
                   "Welcome to my Portfolio",
                   "Glad to see you here!"
                 ]}
@@ -45,8 +61,8 @@ function App() {
               />
             </div>
 
-            <div className="mt-6 text-gray-300 max-w-2xl mx-auto">
-              <p className="text-start">
+            <div className="mt-6 text-gray-300 max-w-4xl mx-auto">
+              <p className="text-center text-lg">
                 I'm a passionate FrontEnd Web Developer with <br />
                 experience in creating dynamic and responsive web applications. <br />
                 Explore my portfolio to see my work and skills.
@@ -54,15 +70,23 @@ function App() {
             </div>
           </div>
 
-          <div className="mx-auto mt-10">
-            <img
-              src={headerImg}
-              alt="Header Img"
-              className="w-74 h-74 object-contain floating-img"
-            />
-          </div>
-
         </main>
+      </div>
+
+      <div className="min-h-screen w-full flex items-center gap-25 justify-center px-4 text-white">
+        <div className="">
+          <PersonalCard />
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <SkillsSection />
+        <Tools />
+      </div>
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <Project />
+      </div>
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <DomeGallery />
       </div>
     </div>
   )

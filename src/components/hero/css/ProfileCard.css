@@ -62,7 +62,7 @@
 
 .pc-card {
   height: 80svh;
-  max-height: 540px;
+  max-height: 450px;
   display: grid;
   aspect-ratio: 0.718;
   border-radius: var(--card-radius);
@@ -342,7 +342,7 @@
 .pc-contact-btn {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: 4px 8px;
   font-size: 14px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
@@ -568,7 +568,7 @@
   }
 
   .pc-contact-btn {
-    padding: 4px 8px;
+    padding: 2px 4px;
     font-size: 9px;
     border-radius: 50px;
   }

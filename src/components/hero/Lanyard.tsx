@@ -15,7 +15,7 @@ import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
 
 import cardGLB from './css/card.glb';
-import lanyard from '../../assets/Lanyard2.jpg';
+import lanyard from '../../assets/Lanyard4.jpeg';
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
@@ -44,34 +44,10 @@ export default function Lanyard({
                     <Band />
                 </Physics>
                 <Environment blur={0.75}>
-                    <Lightformer
-                        intensity={2}
-                        color="white"
-                        position={[0, -1, 5]}
-                        rotation={[0, 0, Math.PI / 3]}
-                        scale={[100, 0.1, 1]}
-                    />
-                    <Lightformer
-                        intensity={3}
-                        color="white"
-                        position={[-1, -1, 1]}
-                        rotation={[0, 0, Math.PI / 3]}
-                        scale={[100, 0.1, 1]}
-                    />
-                    <Lightformer
-                        intensity={3}
-                        color="white"
-                        position={[1, 1, 1]}
-                        rotation={[0, 0, Math.PI / 3]}
-                        scale={[100, 0.1, 1]}
-                    />
-                    <Lightformer
-                        intensity={10}
-                        color="white"
-                        position={[-10, 0, 14]}
-                        rotation={[0, Math.PI / 2, Math.PI / 3]}
-                        scale={[100, 10, 1]}
-                    />
+                    <Lightformer intensity={2} color="white" position={[0, -1, 5]} rotation={[0, 0, Math.PI / 3]} scale={[100, 0.1, 1]} />
+                    <Lightformer intensity={3} color="white" position={[-1, -1, 1]} rotation={[0, 0, Math.PI / 3]} scale={[100, 0.1, 1]} />
+                    <Lightformer intensity={3} color="white" position={[1, 1, 1]} rotation={[0, 0, Math.PI / 3]} scale={[100, 0.1, 1]} />
+                    <Lightformer intensity={10} color="white" position={[-10, 0, 14]} rotation={[0, Math.PI / 2, Math.PI / 3]} scale={[100, 10, 1]} />
                 </Environment>
             </Canvas>
         </div>
@@ -105,41 +81,52 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
     };
 
     const { nodes, materials } = useGLTF(cardGLB) as any;
+
     const texture = useTexture(lanyard);
     texture.flipY = false;
-    texture.center.set(0.5, 0.5);
-    texture.offset.set(0, 0);
-    texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+
+    const img = texture.image;
+    if (img) {
+        const imgRatio = img.width / img.height;
+        const cardRatio = 1 / 1.4;
+        if (imgRatio > cardRatio) {
+            const scale = cardRatio / imgRatio;
+            texture.repeat.set(scale, 1);
+            texture.offset.set((1 - scale) / 1, 0);
+        } else {
+            const scale = imgRatio / cardRatio;
+            texture.repeat.set(1, scale);
+            texture.offset.set(0, (1 - scale) / 1);
+        }
+    }
+
     const [curve] = useState(
-        () =>
-            new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
+        () => new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
     );
+
     const [dragged, drag] = useState<false | THREE.Vector3>(false);
     const [hovered, hover] = useState(false);
 
     const [isSmall, setIsSmall] = useState<boolean>(() => {
-        if (typeof window !== 'undefined') {
-            return window.innerWidth < 1024;
-        }
+        if (typeof window !== 'undefined') return window.innerWidth < 1024;
         return false;
     });
 
     useEffect(() => {
-        const handleResize = (): void => {
-            setIsSmall(window.innerWidth < 1024);
-        };
-
+        const handleResize = (): void => setIsSmall(window.innerWidth < 1024);
         window.addEventListener('resize', handleResize);
         return (): void => window.removeEventListener('resize', handleResize);
     }, []);
 
-    useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
-    useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
-    useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
-    useSphericalJoint(j3, card, [
-        [0, 0, 0],
-        [0, 1.45, 0]
-    ]);
+    const ropeLength = 0.7;
+
+    useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], ropeLength]);
+    useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], ropeLength]);
+    useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], ropeLength]);
+
+    useSphericalJoint(j3, card, [[0, 0, 0], [0, 1.45, 0]]);
 
     useEffect(() => {
         if (hovered) {
@@ -183,23 +170,26 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
     });
 
     curve.curveType = 'chordal';
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
     return (
         <>
             <group position={[0, 4, 0]}>
                 <RigidBody ref={fixed} {...segmentProps} type={'fixed' as RigidBodyProps['type']} />
-                <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
+
+                <RigidBody position={[0.35, 0, 0]} ref={j1} {...segmentProps}>
                     <BallCollider args={[0.1]} />
                 </RigidBody>
-                <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
+
+                <RigidBody position={[0.7, 0, 0]} ref={j2} {...segmentProps}>
                     <BallCollider args={[0.1]} />
                 </RigidBody>
-                <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps} type={'dynamic' as RigidBodyProps['type']}>
+
+                <RigidBody position={[1.05, 0, 0]} ref={j3} {...segmentProps}>
                     <BallCollider args={[0.1]} />
                 </RigidBody>
+
                 <RigidBody
-                    position={[2, 0, 0]}
+                    position={[1.4, 0, 0]}
                     ref={card}
                     {...segmentProps}
                     type={dragged ? ('kinematicPosition' as RigidBodyProps['type']) : ('dynamic' as RigidBodyProps['type'])}
@@ -207,7 +197,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
                     <CuboidCollider args={[0.8, 1.125, 0.01]} />
                     <group
                         scale={2.25}
-                        position={[0, -1.2, -0.05]}
+                        position={[0, -1.2, 0]}
                         onPointerOver={() => hover(true)}
                         onPointerOut={() => hover(false)}
                         onPointerUp={(e: any) => {
@@ -224,8 +214,8 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
                                 map={texture}
                                 clearcoat={1}
                                 clearcoatRoughness={0.15}
-                                roughness={0.9}
-                                metalness={0.8}
+                                roughness={0.3}
+                                metalness={0.5}
                             />
                         </mesh>
                         <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
@@ -233,16 +223,14 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
                     </group>
                 </RigidBody>
             </group>
+
             <mesh ref={band}>
                 <meshLineGeometry />
                 <meshLineMaterial
-                    color="white"
+                    color="#000000"
                     depthTest={false}
                     resolution={isSmall ? [1000, 2000] : [1000, 1000]}
-                    useMap
-                    map={texture}
-                    repeat={[-4, 1]}
-                    lineWidth={1}
+                    lineWidth={3}
                 />
             </mesh>
         </>
