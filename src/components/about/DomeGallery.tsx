@@ -5,7 +5,7 @@ import img1 from '@/assets/Lanyard.png';
 import img2 from '@/assets/Lanyard2.jpg';
 import img3 from '@/assets/Lanyard3.jpeg';
 import img4 from '@/assets/Lanyard4.jpeg';
-import img5 from '@/assets/profile.png'
+import img5 from '@/assets/Profile.png'
 
 type ImageItem = string | { 
   src: string; 
